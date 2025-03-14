@@ -9,4 +9,4 @@ function destroy(table, idList) {
     });
 }
 
-// destroy('Utilisateur', ['recqg11U5S7bSHrb4'])
+export { destroy }

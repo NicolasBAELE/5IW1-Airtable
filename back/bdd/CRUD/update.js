@@ -9,9 +9,4 @@ function update(table, data) {
     });
 }
 
-// update('Utilisateur', [{
-//     id: 'recp7IxECTL21fCKu',
-//     fields: {
-//         "TJM": 500,
-//     }
-// }])
+export { update }

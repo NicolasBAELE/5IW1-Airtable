@@ -1,0 +1,26 @@
+{
+  "name": "airtable",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicolasBAELE/5IW1-Airtable.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NicolasBAELE/5IW1-Airtable/issues"
+  },
+  "homepage": "https://github.com/NicolasBAELE/5IW1-Airtable#readme",
+  "dependencies": {
+    "airtable": "^0.12.2",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

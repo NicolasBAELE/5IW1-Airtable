@@ -1,0 +1,5 @@
+services:
+
+  node:
+    container_name: node
+    image:node
