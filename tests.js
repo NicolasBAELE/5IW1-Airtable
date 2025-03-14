@@ -54,7 +54,7 @@ import { register } from "./back/authentification/register.js";
 
 (async () => {
     try {
-        const token = await login('nicolas@gmail.com', 'Niko2502003333')
+        const token = await login('nicolas@gmail.com', 'mot de passe')
         console.log(token);
     } catch (error) {
         console.error('Error login user:', error);
