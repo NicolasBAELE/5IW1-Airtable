@@ -1,5 +1,22 @@
 services:
+  react:
+    container_name: react
+    image: node:23.11.0-alpine
+    ports:
+      - "2000:2000"
+    volumes:
+      - ./front:/app/
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
 
-  node:
-    container_name: node
-    image:node
+  nest:
+    container_name: nest
+    image: node:23.11.0-alpine
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./back:/app/
+    working_dir: /app
+    command: sh -c "npm install && npm run start:dev"
+    environment:
+      - PORT=3000
