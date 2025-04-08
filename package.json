@@ -17,14 +17,9 @@
     "url": "https://github.com/NicolasBAELE/5IW1-Airtable/issues"
   },
   "homepage": "https://github.com/NicolasBAELE/5IW1-Airtable#readme",
-  "dependencies": {
-    "airtable": "^0.12.2",
-    "bcryptjs": "^3.0.2",
-    "dotenv": "^16.4.7",
-    "jsonwebtoken": "^9.0.2"
-  },
   "workspaces": [
     "back",
     "front"
-  ]
+  ],
+  "devDependencies": {}
 }

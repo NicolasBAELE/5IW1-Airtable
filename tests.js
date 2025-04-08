@@ -1,14 +1,14 @@
-import { login } from "./back/authentification/login.js";
-import { register } from "./back/authentification/register.js";
+import { retrieve } from "./back/src/bdd/CRUD/retrieve";
 
-// (async () => {
-//     try {
-//         const users = await retrieve('Utilisateur', { filterByFormula: `email = 'lecaplain@gmail.com'` });
-//         console.log(users);
-//     } catch (error) {
-//         console.error('Error retrieving users:', error);
-//     }
-// })();
+
+(async () => {
+    try {
+        const users = await retrieve('Administrateurs');
+        console.log(users);
+    } catch (error) {
+        console.error('Error retrieving users:', error);
+    }
+})();
 
 // (async () => {
 //     try {
@@ -37,13 +37,10 @@ import { register } from "./back/authentification/register.js";
 
 // (async () => {
 //     try {
-//         const user = await register({
-//             "lastname": "BAELE",
-//             "firstname": "Nicolas",
-//             "email": "nicolas@gmail.com",
-//             "job": "Juste le Boss",
-//             "tjm": 1000,
-//             "password": "Niko250200"
+//         const user = await register('Administrateurs', {
+//             "name": "Nicolas BAELE",
+//             "email": "nicolas2@gmail.com",
+//             "password": "password"
 //         })
 //         console.log(user);
 //     } catch (error) {
@@ -52,11 +49,21 @@ import { register } from "./back/authentification/register.js";
 // })();
 
 
-(async () => {
-    try {
-        const token = await login('nicolas@gmail.com', 'mot de passe')
-        console.log(token);
-    } catch (error) {
-        console.error('Error login user:', error);
-    }
-})();
+// (async () => {
+//     try {
+//         const token = await login('nicolas@gmail.com', 'Niko250200')
+//         console.log(token);
+//     } catch (error) {
+//         console.error('Error login user:', error);
+//     }
+// })();
+
+// (async () => {
+//     try {
+//         const token = await verifyToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NDQwMjk1ODgsImV4cCI6MTc0NDAzMzE4OH0.vXTg49_yh8FS-qpmvL3GU4ertYN0YQ0OHCsn3bXIrbk')
+//         console.log(token);
+//     } catch (error) {
+//         console.error('Error login user:', error);
+//     }
+// })();
+

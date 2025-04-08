@@ -3,6 +3,7 @@ const cors = require('cors');
 const { retrieve } = require('./src/bdd/CRUD/retrieve');
 const { register } = require('./src/authentification/register');
 const { login } = require('./src/authentification/login');
+const { create } = require('./src/bdd/CRUD/create');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -51,6 +52,17 @@ app.get('/student', async (req, res) => {
         res.send(data);
     } catch (error) {
         console.error('Error retrieving students:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+app.post('/student', async (req, res) => {
+    try {
+        const data = await create('Etudiants', req.body);
+        res.send(data);
+    } catch (error) {
+        console.error('Error registering student:', error);
         res.status(500).send('Internal Server Error');
     }
 });
