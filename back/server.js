@@ -45,6 +45,17 @@ app.post('/login', async (req, res) => {
 });
 
 
+app.get('/student', async (req, res) => {
+    try {
+        const data = await retrieve('Etudiants');
+        res.send(data);
+    } catch (error) {
+        console.error('Error retrieving students:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 // Démarrer le serveur
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
