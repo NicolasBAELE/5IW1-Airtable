@@ -8,14 +8,14 @@ const Navbar = () => {
     const navigate = useNavigate()
 
     return (
-        <nav className="bg-gray-800 p-4">
+        <nav className="bg-red-800 p-4">
             <ul className="flex space-x-4">
                 <li>
                     <Button label={"Home"} onClick={() => navigate('/')} />
                 </li>
                 {!isAuthenticated && <>
                     <li>
-                        <Button label={"S'inscrire"} onClick={() => navigate('/register')} />
+                        <Button className="font-bold" label={"S'inscrire"} onClick={() => navigate('/register')} />
                     </li>
                     <li>
                         <Button label={"Se connecter"} onClick={() => navigate('/login')} />
