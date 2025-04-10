@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+.infinite-loading {
+  width: 50%;
+  animation: loading 01s infinite;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(150%);
+  }
+}

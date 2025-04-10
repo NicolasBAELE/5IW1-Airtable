@@ -2,7 +2,7 @@ import { useState } from "react"
 import Input from "../components/Input"
 import { Button } from "../components/Button"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../components/AuthContext"
+import { useAuth } from "../contexts/AuthContext"
 
 export const Login = () => {
     const [email, setEmail] = useState("")

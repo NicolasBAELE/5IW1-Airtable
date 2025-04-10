@@ -1,12 +1,15 @@
 import base from "../credentials.js";
 
-function update(table, data) {
-    base(table).update(data, function (err) {
-        if (err) {
-            console.error(err);
-            return;
-        }
+async function update(table, data) {
+    return new Promise((resolve, reject) => {
+        base(table).update(data, function (err) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve('Update done');
+        });
     });
 }
 
-export { update }
+export { update };

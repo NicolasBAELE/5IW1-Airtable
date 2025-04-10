@@ -4,26 +4,39 @@ import './App.css'
 import { Register } from './pages/register';
 import { Home } from './pages/home';
 import { Login } from "./pages/Login";
-import { AuthProvider } from "./components/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Students } from "./pages/Students";
 import Navbar from "./components/Navbar";
+import { AuthProvider } from "./contexts/AuthContext";
+import { GlobalProvider } from "./contexts/GlobalContext";
+import LoadingBar from "./components/LoadingBar";
+import { Projects } from "./pages/Projects";
+import { Categories } from "./pages/Categories";
+import { Technologies } from "./pages/Technologies";
+import { Comments } from "./pages/Comments";
 
 function App() {
   return (
-    <AuthProvider>
+    <GlobalProvider>
       <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/">
-            <Route index element={<Home />} />
-            <Route path="register" element={<Register />} />
-            <Route path="login" element={<Login />} />
-            <Route path="students" element={<ProtectedRoute element={Students} />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Navbar />
+          <LoadingBar />
+          <Routes>
+            <Route path="/">
+              <Route index element={<Home />} />
+              <Route path="register" element={<Register />} />
+              <Route path="login" element={<Login />} />
+              <Route path="students" element={<ProtectedRoute element={Students} />} />
+              <Route path="projects" element={<ProtectedRoute element={Projects} />} />
+              <Route path="categories" element={<ProtectedRoute element={Categories} />} />
+              <Route path="technologies" element={<ProtectedRoute element={Technologies} />} />
+              <Route path="comments" element={<ProtectedRoute element={Comments} />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
-    </AuthProvider>
+    </GlobalProvider>
   )
 }
 

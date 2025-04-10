@@ -1,21 +1,27 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { postJson } from '../services/fetch.services';
+import { useGlobal } from './GlobalContext';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate()
+  const { setGlobalLoading } = useGlobal()
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
   const [token, setToken] = useState("");
 
 
   const login = (userData) => {
+    setGlobalLoading(true)
     postJson('login', userData)
       .then((res) => {
-        alert('Vous êtes connecté')
         setIsAuthenticated(true)
         setToken(res.token)
+        navigate('/projects')
       })
       .catch(err => alert(err))
+      .finally(() => setGlobalLoading(false))
 
   };
 
