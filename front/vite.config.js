@@ -9,10 +9,10 @@ export default defineConfig({
     server: {
         port: 2000,
         host: true,
-        // watch: {
-        //     usePolling: true,
-        //     interval: 100,
-        // },
+        watch: {
+            usePolling: true,
+            interval: 100,
+        },
     },
     resolve: {
         alias: {
