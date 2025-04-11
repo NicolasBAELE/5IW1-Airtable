@@ -4,7 +4,6 @@ const { retrieve } = require('./src/bdd/CRUD/retrieve');
 const { register } = require('./src/authentification/register');
 const { login } = require('./src/authentification/login');
 const { create } = require('./src/bdd/CRUD/create');
-const { log } = require('console');
 const { update } = require('./src/bdd/CRUD/update');
 const { checkIdsExistence, toArray, retrieveLinkedDetails } = require('./src/utils/utils.bdd');
 const app = express();
@@ -91,8 +90,8 @@ app.get('/project', async (req, res) => {
 
 app.post('/project', async (req, res) => {
     try {
-        const { name, student, description, project_link, category, technologies } = req.body
-        if (!name || !student || !description || !project_link || !category || !technologies) {
+        const { name, student, description, project_link, category, technologies, image_url } = req.body
+        if (!name || !student || !description || !category || !technologies) {
             throw new Error("Tous les champs sont obligatoires");
         }
 
@@ -105,7 +104,8 @@ app.post('/project', async (req, res) => {
             publishing_status: "caché",
             description,
             project_link,
-            technologies: toArray(technologies)
+            technologies: toArray(technologies),
+            image: [{ url: image_url }]
         }
 
         await checkIdsExistence('Users', student);
@@ -122,9 +122,9 @@ app.post('/project', async (req, res) => {
 
 app.put('/project', async (req, res) => {
     try {
-        const { id, name, student, description, project_link, category, technologies } = req.body
+        const { id, name, student, description, project_link, category, technologies, image_url } = req.body
 
-        if (!id || !name || !student || !description || !project_link || !category || !technologies) {
+        if (!id || !name || !student || !description || !category || !technologies) {
             throw new Error("Tous les champs sont obligatoires");
         }
 
@@ -140,7 +140,8 @@ app.put('/project', async (req, res) => {
             publishing_status: "caché",
             description,
             project_link,
-            technologies: toArray(technologies)
+            technologies: toArray(technologies),
+            image: [{ url: image_url }]
         }
 
         const query = await update("Projets", [{

@@ -7,7 +7,7 @@ async function update(table, data) {
                 reject(err);
                 return;
             }
-            resolve('Update done');
+            resolve({ message: 'Update done' });
         });
     });
 }

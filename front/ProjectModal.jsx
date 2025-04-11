@@ -17,13 +17,16 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
     const [selectedTechnologies, setSelectedTechnologies] = useState([])
     const [description, setDescription] = useState('')
     const [projectLink, setProjectsLink] = useState('')
-    const [file, setFile] = useState(null);
 
+
+    const [file, setFile] = useState(null);
+    const [imageUrl, setImageUrl] = useState('');
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         if (project) {
             setProjectName(project.name || '');
-            setSelectedStudent(project.user || '');
+            setSelectedStudent(project.student || '');
             setSelectedCategory(project.category || '');
             setSelectedTechnologies(project.technologies || []);
             setDescription(project.description || '');
@@ -31,8 +34,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
         }
     }, [project]);
 
-
-    const handleCreateProject = async () => {
+    const handleCreateProject = () => {
         if (projectName && selectedStudent && description && selectedCategory && selectedTechnologies.length > 0) {
             const method = project ? putJson : postJson
             method('project', {
@@ -43,7 +45,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                 description,
                 project_link: projectLink,
                 technologies: selectedTechnologies,
-                image_url: file ? await handleUpload() : project?.image,
+                image_url: imageUrl,
             }).finally(onSuccess)
             setProjectName('')
             setSelectedStudent('')
@@ -51,7 +53,6 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
             setProjectsLink('')
             setSelectedCategory('')
             setSelectedTechnologies([])
-            setFile(null)
             onClose()
         } else {
             alert('Veuillez remplir tous les champs.');
@@ -72,26 +73,33 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
         setFile(e.target.files[0]);
     };
 
+    console.log("env. " + JSON.stringify(import.meta.env, null, 2));
+
     const handleUpload = async () => {
         if (!file) return;
+        setUploading(true);
 
+        // 1. Upload to Cloudinary
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET);
+        formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET); // ⚠️ ton preset ici
 
-        const cloudName = import.meta.env.VITE_CLOUD_NAME;
+        const cloudName = import.meta.env.VITE_CLOUD_NAME; // ⚠️ ton cloud name ici
 
         try {
             const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                 method: 'POST',
                 body: formData,
-            })
+            });
 
             const data = await res.json();
-            console.log('Image uploaded');
-            return data.secure_url;
+            const url = data.secure_url;
+            setImageUrl(url);
+            console.log('Image uploaded:', url);
         } catch (err) {
             console.error('Erreur upload:', err);
+        } finally {
+            setUploading(false);
         }
     }
 
@@ -99,7 +107,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={`${project ? "Modifier" : "Créer"} un Projet`}
+            title="Créer un Projet"
             actions={
                 <>
                     <Button label="Annuler" onClick={onClose} color="gray" />
@@ -134,11 +142,17 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
             </div>
             <div className="mb-4">
                 <input type="file" accept="image/*" onChange={handleFileChange} />
-                {(file || project?.image) && (
+                <button
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    {uploading ? 'Uploading...' : 'Upload'}
+                </button>
+                {imageUrl && (
                     <div>
                         <p className="text-green-600">Image uploaded 👇</p>
-                        {/* <img src={imageUrl} alt="Uploaded" className="w-full mt-2 rounded shadow" /> */}
-                        {"ok"}
+                        <img src={imageUrl} alt="Uploaded" className="w-full mt-2 rounded shadow" />
                     </div>
                 )}
             </div>

@@ -73,6 +73,15 @@ export const Projects = () => {
                             const value = project[key];
                             const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
 
+                            if (key === 'image') {
+                                return (
+                                    <div key={key} className="flex flex-col border-b pb-2">
+                                        <span className="font-semibold text-gray-600">{key}:</span>
+                                        <img src={value[0].url} alt="Uploaded" className="w-full mt-2 rounded shadow" />
+                                    </div>
+                                )
+                            }
+
                             return (
                                 <div key={key} className="flex flex-col border-b pb-2">
                                     <span className="font-semibold text-gray-600">{key}:</span>

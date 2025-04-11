@@ -11,8 +11,6 @@ export const useGetStudents = () => {
         getJson('user')
             .then((res) => {
                 setStudents(res.filter(user => !user.is_admin))
-                console.log(res);
-
             })
             .finally(() => setGlobalLoading(false))
     }
