@@ -1,20 +1,19 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import './App.css'
-import { Register } from './pages/register';
-import { Login } from "./pages/Login";
+import "./App.css";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { GlobalProvider } from "./contexts/GlobalContext";
 import { Categories } from "./pages/Categories";
 import { Comments } from "./pages/Comments";
-import { Home } from "./pages/home";
-import { Login } from "./pages/Login";
+import { Layout } from "./pages/Layout";
 import { Projects } from "./pages/Projects";
 import { Register } from "./pages/register";
 import { Students } from "./pages/Students";
 import { Technologies } from "./pages/Technologies";
-import { Layout } from "./pages/Layout";
+import LoadingBar from "./components/LoadingBar";
+import { Home } from "./pages/Home";
+import { Login } from "./pages/Login";
 
 function App() {
     return (
@@ -65,7 +64,5 @@ function App() {
         </GlobalProvider>
     );
 }
-
-export const foo = 12;
 
 export default App;
