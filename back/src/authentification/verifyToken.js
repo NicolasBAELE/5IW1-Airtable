@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-function verifyToken(token) {
+async function verifyToken(token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         console.log('Token valide. Données décodées:', decoded);

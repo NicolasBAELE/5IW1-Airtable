@@ -14,9 +14,9 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get('/admin', async (req, res) => {
+app.get('/user', async (req, res) => {
     try {
-        const data = await retrieve('Administrateurs');
+        const data = await retrieve('Users');
         res.send(data);
     } catch (error) {
         console.error('Error retrieving admin:', error);
@@ -24,9 +24,9 @@ app.get('/admin', async (req, res) => {
     }
 });
 
-app.post('/admin', async (req, res) => {
+app.post('/user', async (req, res) => {
     try {
-        const data = await register('Administrateurs', req.body);
+        const data = await register(req.body);
         res.send(data);
     } catch (error) {
         console.error('Error registering admin:', error);
@@ -49,9 +49,9 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get('/student', async (req, res) => {
+app.get('/user', async (req, res) => {
     try {
-        const data = await retrieve('Etudiants');
+        const data = await retrieve('Users');
         res.send(data);
     } catch (error) {
         console.error('Error retrieving students:', error);
@@ -59,26 +59,14 @@ app.get('/student', async (req, res) => {
     }
 });
 
-
-app.post('/student', async (req, res) => {
-    try {
-        const data = await create('Etudiants', req.body);
-        res.send(data);
-    } catch (error) {
-        console.error('Error registering student:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
 app.get('/project', async (req, res) => {
     try {
         const projects = await retrieve('Projets');
-        console.log(projects);
 
         const enrichedProjects = await Promise.all(
             projects.map(async (project) => {
                 const [studentDetails, categoryDetails, technologyDetails, commentsDetails] = await Promise.all([
-                    retrieveLinkedDetails('Etudiants', project.student),
+                    retrieveLinkedDetails('Users', project.user),
                     retrieveLinkedDetails('Categories', project.category),
                     retrieveLinkedDetails('Technologies', project.technologies),
                     retrieveLinkedDetails('Commentaires', project.comments),
@@ -93,8 +81,6 @@ app.get('/project', async (req, res) => {
                 };
             })
         );
-
-        console.log(enrichedProjects);
 
         res.send(enrichedProjects);
     } catch (error) {
@@ -112,7 +98,7 @@ app.post('/project', async (req, res) => {
 
         const data = {
             name,
-            student: toArray(student),
+            user: toArray(student),
             category: toArray(category),
             creation_date: new Date().toISOString(),
             likes: 0,
@@ -122,7 +108,7 @@ app.post('/project', async (req, res) => {
             technologies: toArray(technologies)
         }
 
-        await checkIdsExistence('Etudiants', student);
+        await checkIdsExistence('Users', student);
         await checkIdsExistence('Categories', category);
         await checkIdsExistence('Technologies', technologies);
 
@@ -143,13 +129,13 @@ app.put('/project', async (req, res) => {
         }
 
         await checkIdsExistence('Projets', id);
-        await checkIdsExistence('Etudiants', student);
+        await checkIdsExistence('Users', student);
         await checkIdsExistence('Categories', category);
         await checkIdsExistence('Technologies', technologies);
 
         const data = {
             name,
-            student: toArray(student),
+            user: toArray(student),
             category: toArray(category),
             publishing_status: "caché",
             description,
@@ -170,7 +156,7 @@ app.put('/project', async (req, res) => {
 
 app.put('/project/like', async (req, res) => {
     try {
-        const { id } = req.body
+        const { id, user } = req.body
         if (!id) {
             throw new Error('Un ID est obligatoire pour liker')
         }
@@ -179,12 +165,13 @@ app.put('/project/like', async (req, res) => {
             throw new Error(`Le projet avec l'ID ${id.trim()} n'existe pas`);
         }
 
+        await checkIdsExistence('Users', user)
         const oldProject = records[0]
 
         const data = await update('Projets', [{
             id,
             fields: {
-                "likes": (oldProject.likes || 0) + 1
+                "likes": [...toArray(oldProject.likes), user]
             }
         }]);
         res.send({ data });
@@ -279,7 +266,7 @@ app.get('/comment', async (req, res) => {
 
 app.post('/comment', async (req, res) => {
     try {
-        const { comment, project } = req.body
+        const { comment, project, user } = req.body
         if (!comment) {
             throw new Error("Un commentaire doit avoir une description");
         }
@@ -289,6 +276,7 @@ app.post('/comment', async (req, res) => {
         const data = await create('Commentaires', {
             comment,
             project: [project],
+            user: [user],
             creation_date: new Date().toISOString(),
         });
         res.send(data);

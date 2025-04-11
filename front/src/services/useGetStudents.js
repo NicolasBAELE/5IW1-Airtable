@@ -8,8 +8,12 @@ export const useGetStudents = () => {
 
     const getStudents = () => {
         setGlobalLoading(true)
-        getJson('student')
-            .then(setStudents)
+        getJson('user')
+            .then((res) => {
+                setStudents(res.filter(user => !user.is_admin))
+                console.log(res);
+
+            })
             .finally(() => setGlobalLoading(false))
     }
 

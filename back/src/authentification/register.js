@@ -2,7 +2,7 @@ import { create } from "../bdd/CRUD/create.js"
 import { retrieve } from "../bdd/CRUD/retrieve.js"
 import bcrypt from 'bcryptjs';
 
-async function register(table, fields) {
+async function register(fields) {
     try {
         const { password, email, ...remainingFields } = fields
 
@@ -16,14 +16,14 @@ async function register(table, fields) {
             throw new Error("Un mot de passe est obligatoire");
         }
 
-        const records = await retrieve(table, { filterByFormula: `email = '${email}'` });
+        const records = await retrieve("Users", { filterByFormula: `email = '${email}'` });
         if (records.length !== 0) {
             throw new Error('Cette adresse email est déjà utilisée');
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        return await create(table, { ...remainingFields, email: email, password: hashedPassword })
+        return await create("Users", { ...remainingFields, email: email, password: hashedPassword })
     } catch (e) {
         console.log('Une erreur est survenue: ', e);
     }

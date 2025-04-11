@@ -4,17 +4,20 @@ import Modal from './Modal';
 import { postJson } from '../services/fetch.services';
 import Input from './Input';
 import { useGetProjects } from '../services/useGetProjects';
+import { useAuth } from '../contexts/AuthContext';
 
 const CreateCommentModal = ({ isOpen, onClose, onSuccess }) => {
     const [comment, setComment] = useState('')
     const [selectedProject, setSelectedProject] = useState('')
     const { projects } = useGetProjects()
+    const { userId } = useAuth()
 
     const handleCreateComment = () => {
-        if (selectedProject && comment) {
+        if (selectedProject && comment && userId) {
             postJson('comment', {
                 comment,
                 project: selectedProject,
+                user: userId
             }).finally(onSuccess)
             setComment('')
             setSelectedProject('')

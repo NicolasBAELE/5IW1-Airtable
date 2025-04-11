@@ -12,8 +12,11 @@ export async function checkIdsExistence(table, ids) {
 }
 
 export const toArray = (stringOrArray) => {
-    return Array.isArray(stringOrArray) ? stringOrArray : [stringOrArray]
-}
+    if (stringOrArray === undefined || stringOrArray === null)
+        return [];
+    return Array.isArray(stringOrArray) ? stringOrArray : [stringOrArray];
+};
+
 
 export async function retrieveLinkedDetails(table, ids) {
     if (!ids || ids.length === 0) return [];

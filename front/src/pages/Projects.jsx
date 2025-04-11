@@ -3,9 +3,11 @@ import { Button } from "../components/Button";
 import ProjectModal from "../components/ProjectModal";
 import { useGetProjects } from "../services/useGetProjects";
 import { putJson } from "../services/fetch.services";
+import { useAuth } from "../contexts/AuthContext";
 
 export const Projects = () => {
     const { projects, getProjects } = useGetProjects();
+    const { userId, isAdmin } = useAuth()
 
     const [project, setProject] = useState(null)
     const [isOpen, setIsOpen] = useState(false);
@@ -20,8 +22,8 @@ export const Projects = () => {
         );
 
     const handleLike = (id) => {
-        if (id) {
-            putJson('project/like', { id })
+        if (id && !isAdmin && userId) {
+            putJson('project/like', { id, user: userId })
                 .then(() => getProjects())
         } else {
             alert('ID manquant pour le like !')
@@ -46,8 +48,6 @@ export const Projects = () => {
         setIsOpen(false)
         setProject(null)
     }
-    console.log(filteredProjects);
-
 
     return (
         <div className="container mx-auto p-4">
@@ -65,19 +65,18 @@ export const Projects = () => {
                 className="mb-4 p-2 w-full border rounded-md"
             />
             <div className="grid gap-4">
-                {filteredProjects.map((project, index) => (
-                    <div key={index} className="bg-white shadow rounded-lg p-4">
+                {filteredProjects.map((project, index) => {
+                    const hasAlreadyLiked = project?.likes?.includes(userId)
+
+                    return <div key={index} className="bg-white shadow rounded-lg p-4">
                         {Object.keys(project).map(key => {
                             const value = project[key];
-
-                            // Vérifie si la valeur est un tableau d'objets
                             const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
 
                             return (
                                 <div key={key} className="flex flex-col border-b pb-2">
                                     <span className="font-semibold text-gray-600">{key}:</span>
                                     {isArrayOfObjects ? (
-                                        // Si c'est un tableau d'objets, affiche chaque objet
                                         <div className="pl-4">
                                             {value.map((item, subIndex) => (
                                                 <div key={subIndex} className="flex flex-col border-b pb-2">
@@ -98,12 +97,13 @@ export const Projects = () => {
                             );
                         })}
 
-                        <Button label="Liker" onClick={() => handleLike(project.id)} />
-                        <Button label="Modifier" onClick={() => handleUpdate(project)} />
-                        {project.publishing_status !== "caché" && <Button label="Cacher" onClick={() => handlePublishingStatus(project.id, "caché")} />}
-                        {project.publishing_status !== "publié" && <Button label="Publier" onClick={() => handlePublishingStatus(project.id, "publié")} />}
+
+                        {!isAdmin && !hasAlreadyLiked && <Button label="Liker" onClick={() => handleLike(project.id)} />}
+                        {isAdmin && <Button label="Modifier" onClick={() => handleUpdate(project)} />}
+                        {isAdmin && project.publishing_status !== "caché" && <Button label="Cacher" onClick={() => handlePublishingStatus(project.id, "caché")} />}
+                        {isAdmin && project.publishing_status !== "publié" && <Button label="Publier" onClick={() => handlePublishingStatus(project.id, "publié")} />}
                     </div>
-                ))}
+                })}
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import { Button } from './Button';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, logout, isAdmin } = useAuth();
     const navigate = useNavigate();
 
     return (
@@ -14,13 +14,6 @@ const Navbar = () => {
                     <span className="text-red-500">My</span>Portfolio
                 </div>
                 <ul className="flex space-x-6">
-                    <li>
-                        <Button
-                            label="Home"
-                            onClick={() => navigate('/')}
-                            color="gray"
-                        />
-                    </li>
                     {!isAuthenticated && (
                         <>
                             <li>
@@ -39,7 +32,25 @@ const Navbar = () => {
                             </li>
                         </>
                     )}
-                    {isAuthenticated && (
+                    {isAuthenticated &&
+                        <>
+                            <li>
+                                <Button
+                                    label="Projets"
+                                    onClick={() => navigate('/projects')}
+                                    color="gray"
+                                />
+                            </li>
+                            <li>
+                                <Button
+                                    label="Se déconnecter"
+                                    onClick={() => logout()}
+                                    color="red"
+                                />
+                            </li>
+                        </>
+                    }
+                    {isAuthenticated && isAdmin && (
                         <>
                             <li>
                                 <Button
@@ -64,23 +75,9 @@ const Navbar = () => {
                             </li>
                             <li>
                                 <Button
-                                    label="Projets"
-                                    onClick={() => navigate('/projects')}
-                                    color="gray"
-                                />
-                            </li>
-                            <li>
-                                <Button
                                     label="Étudiants"
                                     onClick={() => navigate('/students')}
                                     color="gray"
-                                />
-                            </li>
-                            <li>
-                                <Button
-                                    label="Se déconnecter"
-                                    onClick={() => logout()}
-                                    color="red"
                                 />
                             </li>
                         </>
