@@ -50,68 +50,101 @@ export const Projects = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto px-4 py-8">
             <ProjectModal isOpen={isOpen} onClose={handleClose} onSuccess={getProjects} project={project} />
-            <Button
-                label="Ajouter un Projet"
-                onClick={() => setIsOpen(true)}
-            />
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Projets</h2>
-            <input
-                type="text"
-                placeholder="Rechercher des projets..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-4 p-2 w-full border rounded-md"
-            />
-            <div className="grid gap-4">
+            
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800">Projets</h2>
+                <Button
+                    label="Ajouter un Projet"
+                    onClick={() => setIsOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                />
+            </div>
+
+            <div className="mb-6">
+                <input
+                    type="text"
+                    placeholder="Rechercher des projets..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map((project, index) => {
                     const hasAlreadyLiked = project?.likes?.includes(userId)
 
-                    return <div key={index} className="bg-white shadow rounded-lg p-4">
-                        {Object.keys(project).map(key => {
-                            const value = project[key];
-                            const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
+                    return (
+                        <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                            {project.image && project.image[0] && (
+                                <div className="relative h-48 overflow-hidden">
+                                    <img 
+                                        src={project.image[0].url} 
+                                        alt={project.title || "Project image"} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )}
+                            
+                            <div className="p-6">
+                                <div className="space-y-4">
+                                    {Object.entries(project).map(([key, value]) => {
+                                        if (key === 'image' || key === 'id' || key === 'likes') return null;
+                                        
+                                        const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
+                                        
+                                        if (isArrayOfObjects) return null;
 
-                            if (key === 'image') {
-                                return (
-                                    <div key={key} className="flex flex-col border-b pb-2">
-                                        <span className="font-semibold text-gray-600">{key}:</span>
-                                        <img src={value[0].url} alt="Uploaded" className="w-full mt-2 rounded shadow" />
-                                    </div>
-                                )
-                            }
+                                        return (
+                                            <div key={key} className="flex flex-col">
+                                                <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                                    {key.replace(/_/g, ' ')}
+                                                </span>
+                                                <span className="text-gray-800 mt-1">
+                                                    {value}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
 
-                            return (
-                                <div key={key} className="flex flex-col border-b pb-2">
-                                    <span className="font-semibold text-gray-600">{key}:</span>
-                                    {isArrayOfObjects ? (
-                                        <div className="pl-4">
-                                            {value.map((item, subIndex) => (
-                                                <div key={subIndex} className="flex flex-col border-b pb-2">
-                                                    {Object.keys(item).map(subKey => (
-                                                        <div key={subKey} className="flex justify-between">
-                                                            <span className="font-semibold text-gray-500">{subKey}:</span>
-                                                            <span className="text-gray-700">{item[subKey]}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        // Sinon, affiche la valeur directement
-                                        <span className="text-gray-800">{value}</span>
+                                <div className="mt-6 flex flex-wrap gap-2">
+                                    {!isAdmin && !hasAlreadyLiked && (
+                                        <Button 
+                                            label="Liker" 
+                                            onClick={() => handleLike(project.id)}
+                                            className="bg-pink-500 hover:bg-pink-600 text-white"
+                                        />
+                                    )}
+                                    {isAdmin && (
+                                        <>
+                                            <Button 
+                                                label="Modifier" 
+                                                onClick={() => handleUpdate(project)}
+                                                className="bg-blue-500 hover:bg-blue-600 text-white"
+                                            />
+                                            {project.publishing_status !== "caché" && (
+                                                <Button 
+                                                    label="Cacher" 
+                                                    onClick={() => handlePublishingStatus(project.id, "caché")}
+                                                    className="bg-gray-500 hover:bg-gray-600 text-white"
+                                                />
+                                            )}
+                                            {project.publishing_status !== "publié" && (
+                                                <Button 
+                                                    label="Publier" 
+                                                    onClick={() => handlePublishingStatus(project.id, "publié")}
+                                                    className="bg-green-500 hover:bg-green-600 text-white"
+                                                />
+                                            )}
+                                        </>
                                     )}
                                 </div>
-                            );
-                        })}
-
-
-                        {!isAdmin && !hasAlreadyLiked && <Button label="Liker" onClick={() => handleLike(project.id)} />}
-                        {isAdmin && <Button label="Modifier" onClick={() => handleUpdate(project)} />}
-                        {isAdmin && project.publishing_status !== "caché" && <Button label="Cacher" onClick={() => handlePublishingStatus(project.id, "caché")} />}
-                        {isAdmin && project.publishing_status !== "publié" && <Button label="Publier" onClick={() => handlePublishingStatus(project.id, "publié")} />}
-                    </div>
+                            </div>
+                        </div>
+                    );
                 })}
             </div>
         </div>

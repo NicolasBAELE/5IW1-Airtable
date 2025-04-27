@@ -35,7 +35,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
     const handleCreateProject = async () => {
         if (projectName && selectedStudent && description && selectedCategory && selectedTechnologies.length > 0) {
             const method = project ? putJson : postJson
-            method('project', {
+            const payload = {
                 id: project?.id,
                 name: projectName,
                 student: selectedStudent,
@@ -43,8 +43,13 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                 description,
                 project_link: projectLink,
                 technologies: selectedTechnologies,
-                image_url: file ? await handleUpload() : project?.image,
-            }).finally(onSuccess)
+            };
+            if (file) {
+                payload.image_url = await handleUpload();
+            } else if (project?.image) {
+                payload.image_url = project.image;
+            }
+            method('project', payload).finally(onSuccess)
             setProjectName('')
             setSelectedStudent('')
             setDescription('')
