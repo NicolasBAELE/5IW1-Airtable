@@ -6,19 +6,20 @@ import { useGetStudents } from '../services/useGetStudents';
 import Input from './Input';
 import { useGetCategories } from '../services/useGetCategories';
 import { useGetTechnologies } from '../services/useGetTechnologies';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
-    const [projectName, setProjectName] = useState('')
-    const { students } = useGetStudents()
-    const [selectedStudent, setSelectedStudent] = useState('')
-    const { categories } = useGetCategories()
-    const [selectedCategory, setSelectedCategory] = useState('')
-    const { technologies } = useGetTechnologies()
-    const [selectedTechnologies, setSelectedTechnologies] = useState([])
-    const [description, setDescription] = useState('')
-    const [projectLink, setProjectsLink] = useState('')
+    const { isAdmin } = useAuth();
+    const [projectName, setProjectName] = useState('');
+    const { students } = useGetStudents();
+    const [selectedStudent, setSelectedStudent] = useState('');
+    const { categories } = useGetCategories();
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const { technologies } = useGetTechnologies();
+    const [selectedTechnologies, setSelectedTechnologies] = useState([]);
+    const [description, setDescription] = useState('');
+    const [projectLink, setProjectsLink] = useState('');
     const [file, setFile] = useState(null);
-
 
     useEffect(() => {
         if (project) {
@@ -31,10 +32,9 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
         }
     }, [project]);
 
-
     const handleCreateProject = async () => {
         if (projectName && selectedStudent && description && selectedCategory && selectedTechnologies.length > 0) {
-            const method = project ? putJson : postJson
+            const method = project ? putJson : postJson;
             const payload = {
                 id: project?.id,
                 name: projectName,
@@ -44,24 +44,27 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                 project_link: projectLink,
                 technologies: selectedTechnologies,
             };
+
             if (file) {
                 payload.image_url = await handleUpload();
             } else if (project?.image) {
-                payload.image_url = project.image;
+                console.log(project.image[0].url);
+
+                payload.image_url = project.image[0].url
             }
-            method('project', payload).finally(onSuccess)
-            setProjectName('')
-            setSelectedStudent('')
-            setDescription('')
-            setProjectsLink('')
-            setSelectedCategory('')
-            setSelectedTechnologies([])
-            setFile(null)
-            onClose()
+            method('project', payload).finally(onSuccess);
+            setProjectName('');
+            setSelectedStudent('');
+            setDescription('');
+            setProjectsLink('');
+            setSelectedCategory('');
+            setSelectedTechnologies([]);
+            setFile(null);
+            onClose();
         } else {
             alert('Veuillez remplir tous les champs.');
         }
-    }
+    };
 
     const handleTagClick = (technologyId) => {
         if (!selectedTechnologies.includes(technologyId)) {
@@ -90,7 +93,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
             const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                 method: 'POST',
                 body: formData,
-            })
+            });
 
             const data = await res.json();
             console.log('Image uploaded');
@@ -98,7 +101,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
         } catch (err) {
             console.error('Erreur upload:', err);
         }
-    }
+    };
 
     return (
         <Modal
@@ -106,107 +109,170 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
             onClose={onClose}
             title={`${project ? "Modifier" : "Créer"} un Projet`}
             actions={
-                <>
-                    <Button label="Annuler" onClick={onClose} color="gray" />
-                    <Button label={project ? "Modifier" : "Créer"} onClick={handleCreateProject} />
-                </>
+                isAdmin ? (
+                    <>
+                        <Button label="Annuler" onClick={onClose} color="gray" />
+                        <Button label={project ? "Modifier" : "Créer"} onClick={handleCreateProject} />
+                    </>
+                ) : null
             }
         >
-            <div className="mb-4">
-                <Input
-                    label='Nom du Projet'
-                    type="text"
-                    value={projectName}
-                    setValue={setProjectName}
-                />
-            </div>
-            <div className="mb-4">
-                <Input
-                    label='Lien du projet'
-                    type="text"
-                    value={projectLink}
-                    setValue={setProjectsLink}
-                />
-            </div>
-            <div className="mb-4">
-                <Input
-                    label='Description'
-                    type="text"
-                    value={description}
-                    setValue={setDescription}
-
-                />
-            </div>
-            <div className="mb-4">
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-                {(file || project?.image) && (
-                    <div>
-                        <p className="text-green-600">Image uploaded 👇</p>
-                        {"ok"}
-                    </div>
-                )}
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700">Sélectionner un Étudiant</label>
-                <select
-                    value={selectedStudent}
-                    onChange={(e) => setSelectedStudent(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded-md"
-                >
-                    <option value="" disabled>Sélectionner un étudiant</option>
-                    {students.map((student, index) => (
-                        <option key={index} value={student.id}>
-                            {student.first_name} {student.last_name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700">Sélectionner une Catégorie</label>
-                <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded-md"
-                >
-                    <option value="" disabled>Sélectionner une catégorie</option>
-                    {categories.map((categorie, index) => (
-                        <option key={index} value={categorie.id}>
-                            {categorie.category_name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Sélectionner des Technologies</label>
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {technologies.map((technology) => (
-                        <span
-                            key={technology.id}
-                            onClick={() => handleTagClick(technology.id)}
-                            className="cursor-pointer bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
-                        >
-                            {technology.name}
-                        </span>
-                    ))}
+            <button
+                onClick={onClose}
+                className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-gray-700 focus:outline-none z-50"
+                aria-label="Fermer"
+                style={{ background: 'none', border: 'none' }}
+            >
+                &times;
+            </button>
+            <div className="space-y-6">
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Nom du Projet</h3>
+                    {isAdmin ? (
+                        <Input
+                            label='Nom du Projet'
+                            type="text"
+                            value={projectName}
+                            setValue={setProjectName}
+                        />
+                    ) : (
+                        <p>{projectName}</p>
+                    )}
                 </div>
-                <div className="flex flex-wrap gap-2">
-                    {selectedTechnologies.map((techId) => {
-                        const techName = technologies.find(tech => tech.id === techId).name;
-                        return (
-                            <span
-                                key={techId}
-                                className="flex items-center bg-blue-500 text-white px-3 py-1 rounded-full"
-                            >
-                                {techName}
-                                <button
-                                    onClick={() => handleRemoveTag(techId)}
-                                    className="ml-2 text-white hover:text-gray-300"
-                                >
-                                    &times;
-                                </button>
-                            </span>
-                        );
-                    })}
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Lien du projet</h3>
+                    {isAdmin ? (
+                        <Input
+                            label='Lien du projet'
+                            type="text"
+                            value={projectLink}
+                            setValue={setProjectsLink}
+                        />
+                    ) : (
+                        <p>{projectLink}</p>
+                    )}
+                </div>
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Description</h3>
+                    {isAdmin ? (
+                        <Input
+                            label='Description'
+                            type="text"
+                            value={description}
+                            setValue={setDescription}
+                        />
+                    ) : (
+                        <p>{description}</p>
+                    )}
+                </div>
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Image du projet</h3>
+                    {isAdmin ? (
+                        <>
+                            <input type="file" accept="image/*" onChange={handleFileChange} />
+                            {(file || project?.image) && (
+                                <div>
+                                    <p className="text-green-600">Image uploaded 👇</p>
+                                    {"ok"}
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        project?.image && (
+                            <div>
+                                <img src={project.image} alt="Project" className="max-h-56" />
+                            </div>
+                        )
+                    )}
+                </div>
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Sélectionner un Étudiant</h3>
+                    {isAdmin ? (
+                        <select
+                            value={selectedStudent}
+                            onChange={(e) => setSelectedStudent(e.target.value)}
+                            className="mt-1 p-2 w-full border rounded-md"
+                        >
+                            <option value="" disabled>Sélectionner un étudiant</option>
+                            {students.map((student, index) => (
+                                <option key={index} value={student.id}>
+                                    {student.first_name} {student.last_name}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <p>{students.find(student => student.id === selectedStudent)?.first_name} {students.find(student => student.id === selectedStudent)?.last_name}</p>
+                    )}
+                </div>
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Sélectionner une Catégorie</h3>
+                    {isAdmin ? (
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="mt-1 p-2 w-full border rounded-md"
+                        >
+                            <option value="" disabled>Sélectionner une catégorie</option>
+                            {categories.map((categorie, index) => (
+                                <option key={index} value={categorie.id}>
+                                    {categorie.category_name}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <p>{categories.find(category => category.id === selectedCategory)?.category_name}</p>
+                    )}
+                </div>
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Sélectionner des Technologies</h3>
+                    {isAdmin ? (
+                        <>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {technologies.map((technology) => (
+                                    <span
+                                        key={technology.id}
+                                        onClick={() => handleTagClick(technology.id)}
+                                        className="cursor-pointer bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
+                                    >
+                                        {technology.name}
+                                    </span>
+                                ))}
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {selectedTechnologies.map((techId) => {
+                                    const techName = technologies.find(tech => tech.id === techId).name;
+                                    return (
+                                        <span
+                                            key={techId}
+                                            className="flex items-center bg-blue-500 text-white px-3 py-1 rounded-full"
+                                        >
+                                            {techName}
+                                            <button
+                                                onClick={() => handleRemoveTag(techId)}
+                                                className="ml-2 text-white hover:text-gray-300"
+                                            >
+                                                &times;
+                                            </button>
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex flex-wrap gap-2">
+                            {selectedTechnologies.map((techId) => {
+                                const techName = technologies.find(tech => tech.id === techId).name;
+                                return (
+                                    <span
+                                        key={techId}
+                                        className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs"
+                                    >
+                                        {techName}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </div>
         </Modal>
