@@ -1,8 +1,10 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./Button";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProjectCard({ project, onClick, onLike, hasAlreadyLiked, categories = [], technologies = [], students = [] }) {
+    const { isAdmin } = useAuth()
     // Fonctions de mapping
     const getCategoryName = (catId) => {
         const found = categories.find(c => c.id === catId);
@@ -65,13 +67,12 @@ export default function ProjectCard({ project, onClick, onLike, hasAlreadyLiked,
             </CardContent>
             <CardFooter>
                 <div className="flex items-center gap-3 w-full">
-                    <Button 
-                        label="Aimer" 
-                        onClick={e => { e.stopPropagation(); onLike && onLike(project.id); }} 
+                    {!isAdmin && <Button
+                        label={hasAlreadyLiked ? "Retirer le like" : "Liker"}
+                        onClick={e => { e.stopPropagation(); onLike && onLike(project.id); }}
                         className={hasAlreadyLiked ? "bg-pink-300 text-white" : "bg-white text-pink-500 border border-pink-300"}
                         icon={<span role="img" aria-label="aimer">💗</span>}
-                        disabled={hasAlreadyLiked}
-                    />
+                    />}
                     <span className="flex items-center text-pink-500 text-sm font-semibold select-none">
                         <span role="img" aria-label="likes">❤️</span>&nbsp;{Array.isArray(project.likes) ? project.likes.length : 0}
                     </span>

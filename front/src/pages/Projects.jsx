@@ -35,6 +35,8 @@ export const Projects = () => {
         .filter(project => isAdmin || project.publishing_status === "publié");
 
     const handleLike = (id) => {
+        console.log(id, !isAdmin, userId);
+
         if (id && !isAdmin && userId) {
             putJson('project/like', { id, user: userId })
                 .then(() => getProjects())
