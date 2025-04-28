@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "./Button";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function ProjectCard({ project, onClick, onLike, hasAlreadyLiked, categories = [], technologies = [], students = [] }) {
+export default function ProjectCard({ project, onClick, onLike, onPublish, published, hasAlreadyLiked, categories = [], technologies = [], students = [] }) {
     const { isAdmin } = useAuth()
     // Fonctions de mapping
     const getCategoryName = (catId) => {
@@ -42,7 +42,10 @@ export default function ProjectCard({ project, onClick, onLike, hasAlreadyLiked,
         : project.description;
 
     return (
-        <Card className="cursor-pointer transition-shadow duration-300 hover:shadow-xl overflow-hidden" onClick={onClick}>
+        <Card
+            className={`cursor-pointer transition-shadow duration-300 hover:shadow-xl overflow-hidden ${published ? '' : 'bg-gray-200'}`}
+            onClick={onClick}
+        >
             {imageUrl && (
                 <div className="h-36 w-full overflow-hidden rounded-t-xl mb-2">
                     <img src={imageUrl} alt={project.name} className="object-cover w-full h-full" />
@@ -67,12 +70,22 @@ export default function ProjectCard({ project, onClick, onLike, hasAlreadyLiked,
             </CardContent>
             <CardFooter>
                 <div className="flex items-center gap-3 w-full">
-                    {!isAdmin && <Button
-                        label={hasAlreadyLiked ? "Retirer le like" : "Liker"}
-                        onClick={e => { e.stopPropagation(); onLike && onLike(project.id); }}
-                        className={hasAlreadyLiked ? "bg-pink-300 text-white" : "bg-white text-pink-500 border border-pink-300"}
-                        icon={<span role="img" aria-label="aimer">💗</span>}
-                    />}
+                    {isAdmin &&
+                        <Button
+                            label={published ? "Cacher" : "Publier"}
+                            onClick={e => { e.stopPropagation(); onLike && onPublish(project.id); }}
+                            className={published ? "bg-pink-300 text-white" : "bg-white text-pink-500 border border-pink-300"}
+                            icon={<span role="img" aria-label="aimer">💗</span>}
+                        />
+                    }
+                    {!isAdmin &&
+                        <Button
+                            label={hasAlreadyLiked ? "Retirer le like" : "Liker"}
+                            onClick={e => { e.stopPropagation(); onLike && onLike(project.id); }}
+                            className={hasAlreadyLiked ? "bg-pink-300 text-white" : "bg-white text-pink-500 border border-pink-300"}
+                            icon={<span role="img" aria-label="aimer">💗</span>}
+                        />
+                    }
                     <span className="flex items-center text-pink-500 text-sm font-semibold select-none">
                         <span role="img" aria-label="likes">❤️</span>&nbsp;{Array.isArray(project.likes) ? project.likes.length : 0}
                     </span>

@@ -205,13 +205,16 @@ export const Projects = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map((project, index) => {
                     const hasAlreadyLiked = project?.likes?.includes(userId);
+                    const published = project.publishing_status !== "caché";
                     return (
                         <ProjectCard
                             key={index}
                             project={project}
                             onClick={() => openDetail(project)}
                             onLike={() => handleLike(project.id)}
+                            onPublish={() => handlePublishingStatus(project.id, published ? "caché" : "publié")}
                             hasAlreadyLiked={hasAlreadyLiked}
+                            published={published}
                             categories={categories}
                             technologies={technologies}
                             students={students}
