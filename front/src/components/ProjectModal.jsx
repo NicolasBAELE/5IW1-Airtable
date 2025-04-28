@@ -142,7 +142,6 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                 {(file || project?.image) && (
                     <div>
                         <p className="text-green-600">Image uploaded 👇</p>
-                        {/* <img src={imageUrl} alt="Uploaded" className="w-full mt-2 rounded shadow" /> */}
                         {"ok"}
                     </div>
                 )}

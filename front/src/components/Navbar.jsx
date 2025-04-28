@@ -10,7 +10,7 @@ const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
-        <nav className="bg-white shadow-md p-4 sticky top-0">
+        <nav className="bg-white shadow-md p-4 sticky top-0 z-50">
             <div className="container mx-auto flex justify-between items-center whitespace-nowrap">
                 {/* Logo */}
                 <div className="text-xl font-bold text-gray-800 pr-2">
