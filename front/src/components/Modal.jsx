@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './Button';
 
-const Modal = ({ isOpen, onClose, title, children, actions }) => {
+const Modal = ({ isOpen, onClose, title, children, actions, headerImage }) => {
     if (!isOpen) return null;
 
     // Gestion du clic sur le fond
@@ -20,10 +20,12 @@ const Modal = ({ isOpen, onClose, title, children, actions }) => {
                         &times;
                     </Button>
                 </div>
-                <div className="mt-4">
+                {/* Affichage de l'image header si présente */}
+                {headerImage}
+                <div className="mt-4 pb-24">
                     {children}
                 </div>
-                <div className="flex justify-end mt-4 space-x-2 sticky bottom-0 bg-white p-4 border-t">
+                <div className="flex justify-end mt-4 space-x-2 sticky bottom-0 bg-white p-4 border-t z-20">
                     {actions}
                 </div>
             </div>

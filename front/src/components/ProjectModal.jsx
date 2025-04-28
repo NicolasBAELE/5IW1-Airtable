@@ -116,15 +116,18 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                     </>
                 ) : null
             }
+            headerImage={((file && file.type?.startsWith('image')) || project?.image) ? (
+                <div className="flex justify-center mb-6 mt-4">
+                    <div className="bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 rounded-xl p-2 shadow-inner max-w-xs w-full flex justify-center">
+                        <img
+                            src={file ? URL.createObjectURL(file) : (project?.image?.[0]?.url || project?.image)}
+                            alt="Aperçu du projet"
+                            className="rounded-lg max-h-48 object-cover w-full"
+                        />
+                    </div>
+                </div>
+            ) : null}
         >
-            <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-2xl text-gray-400 hover:text-gray-700 focus:outline-none z-50"
-                aria-label="Fermer"
-                style={{ background: 'none', border: 'none' }}
-            >
-                &times;
-            </button>
             <div className="space-y-6">
                 <div className="mb-4">
                     <h3 className="font-bold text-lg mb-1">Nom du Projet</h3>
@@ -169,11 +172,10 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                     <h3 className="font-bold text-lg mb-1">Image du projet</h3>
                     {isAdmin ? (
                         <>
-                            <input type="file" accept="image/*" onChange={handleFileChange} />
+                            <input type="file" accept="image/*" onChange={handleFileChange} className="mb-2" />
                             {(file || project?.image) && (
                                 <div>
-                                    <p className="text-green-600">Image uploaded 👇</p>
-                                    {"ok"}
+                                    <p className="text-green-600 text-sm">Image uploadée 👇</p>
                                 </div>
                             )}
                         </>
@@ -201,7 +203,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                             ))}
                         </select>
                     ) : (
-                        <p>{students.find(student => student.id === selectedStudent)?.first_name} {students.find(student => student.id === selectedStudent)?.last_name}</p>
+                        <p>{selectedStudent}</p>
                     )}
                 </div>
                 <div className="mb-4">
@@ -220,59 +222,45 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                             ))}
                         </select>
                     ) : (
-                        <p>{categories.find(category => category.id === selectedCategory)?.category_name}</p>
+                        <p>{selectedCategory}</p>
                     )}
                 </div>
                 <div className="mb-4">
                     <h3 className="font-bold text-lg mb-1">Sélectionner des Technologies</h3>
                     {isAdmin ? (
-                        <>
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {technologies.map((technology) => (
-                                    <span
-                                        key={technology.id}
-                                        onClick={() => handleTagClick(technology.id)}
-                                        className="cursor-pointer bg-gray-200 text-gray-700 px-3 py-1 rounded-full"
-                                    >
-                                        {technology.name}
-                                    </span>
-                                ))}
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {selectedTechnologies.map((techId) => {
-                                    const techName = technologies.find(tech => tech.id === techId).name;
-                                    return (
-                                        <span
-                                            key={techId}
-                                            className="flex items-center bg-blue-500 text-white px-3 py-1 rounded-full"
-                                        >
-                                            {techName}
-                                            <button
-                                                onClick={() => handleRemoveTag(techId)}
-                                                className="ml-2 text-white hover:text-gray-300"
-                                            >
-                                                &times;
-                                            </button>
-                                        </span>
-                                    );
-                                })}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="flex flex-wrap gap-2">
-                            {selectedTechnologies.map((techId) => {
-                                const techName = technologies.find(tech => tech.id === techId).name;
-                                return (
-                                    <span
-                                        key={techId}
-                                        className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs"
-                                    >
-                                        {techName}
-                                    </span>
-                                );
-                            })}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {technologies.map((technology) => (
+                                <span
+                                    key={technology.id}
+                                    onClick={() => handleTagClick(technology.id)}
+                                    className={`cursor-pointer px-3 py-1 rounded-full border ${selectedTechnologies.includes(technology.id) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} transition`}
+                                >
+                                    {technology.name}
+                                </span>
+                            ))}
                         </div>
-                    )}
+                    ) : null}
+                    <div className="flex flex-wrap gap-2">
+                        {selectedTechnologies.map((techId) => {
+                            const techName = technologies.find(tech => tech.id === techId)?.name || techId;
+                            return (
+                                <span
+                                    key={techId}
+                                    className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full"
+                                >
+                                    {techName}
+                                    {isAdmin && (
+                                        <button
+                                            onClick={() => handleRemoveTag(techId)}
+                                            className="ml-2 text-blue-700 hover:text-pink-500"
+                                        >
+                                            &times;
+                                        </button>
+                                    )}
+                                </span>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </Modal>
