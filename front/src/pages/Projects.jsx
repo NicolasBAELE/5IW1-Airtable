@@ -2,14 +2,21 @@ import { useState } from "react";
 import { Button } from "../components/Button";
 import ProjectModal from "../components/ProjectModal";
 import { useGetProjects } from "../services/useGetProjects";
-import { putJson } from "../services/fetch.services";
+import { postJson, putJson } from "../services/fetch.services";
 import { useAuth } from "../contexts/AuthContext";
+import ProjectCard from "../components/ProjectCard";
+import { useGetCategories } from "../services/useGetCategories";
+import { useGetTechnologies } from "../services/useGetTechnologies";
+import { useGetStudents } from "../services/useGetStudents";
 
 export const Projects = () => {
     const { projects, getProjects } = useGetProjects();
-    const { userId, isAdmin } = useAuth()
+    const { userId, isAdmin } = useAuth();
+    const { categories } = useGetCategories();
+    const { technologies } = useGetTechnologies();
+    const { students } = useGetStudents();
 
-    const [project, setProject] = useState(null)
+    const [project, setProject] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -19,7 +26,8 @@ export const Projects = () => {
             Object.values(project).some(value =>
                 String(value).toLowerCase().includes(searchQuery.toLowerCase())
             )
-        );
+        )
+        .filter(project => isAdmin || project.publishing_status === "publié");
 
     const handleLike = (id) => {
         if (id && !isAdmin && userId) {
@@ -28,7 +36,7 @@ export const Projects = () => {
         } else {
             alert('ID manquant pour le like !')
         }
-    }
+    };
 
     const handlePublishingStatus = (id, publishing_status) => {
         if (id) {
@@ -37,81 +45,64 @@ export const Projects = () => {
         } else {
             alert('ID manquant pour le changement d\'état!')
         }
-    }
+    };
 
-    const handleUpdate = (project) => {
-        setProject(project)
-        setIsOpen(true)
+    const handleComment = (id, comment) => {
+        postJson('comment', {
+            comment,
+            project: id,
+            user: userId
+        }).finally(() => getProjects())
     }
 
     const handleClose = () => {
-        setIsOpen(false)
-        setProject(null)
-    }
+        setIsOpen(false);
+        setProject(null);
+    };
+
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto px-4 py-8">
             <ProjectModal isOpen={isOpen} onClose={handleClose} onSuccess={getProjects} project={project} />
-            <Button
-                label="Ajouter un Projet"
-                onClick={() => setIsOpen(true)}
-            />
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Projets</h2>
-            <input
-                type="text"
-                placeholder="Rechercher des projets..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-4 p-2 w-full border rounded-md"
-            />
-            <div className="grid gap-4">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800">Projets</h2>
+                <Button
+                    label="Ajouter un Projet"
+                    onClick={() => setIsOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                />
+            </div>
+            <div className="mb-6">
+                <input
+                    type="text"
+                    placeholder="Rechercher des projets..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map((project, index) => {
-                    const hasAlreadyLiked = project?.likes?.includes(userId)
-
-                    return <div key={index} className="bg-white shadow rounded-lg p-4">
-                        {Object.keys(project).map(key => {
-                            const value = project[key];
-                            const isArrayOfObjects = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object';
-
-                            if (key === 'image') {
-                                return (
-                                    <div key={key} className="flex flex-col border-b pb-2">
-                                        <span className="font-semibold text-gray-600">{key}:</span>
-                                        <img src={value[0].url} alt="Uploaded" className="w-full mt-2 rounded shadow" />
-                                    </div>
-                                )
-                            }
-
-                            return (
-                                <div key={key} className="flex flex-col border-b pb-2">
-                                    <span className="font-semibold text-gray-600">{key}:</span>
-                                    {isArrayOfObjects ? (
-                                        <div className="pl-4">
-                                            {value.map((item, subIndex) => (
-                                                <div key={subIndex} className="flex flex-col border-b pb-2">
-                                                    {Object.keys(item).map(subKey => (
-                                                        <div key={subKey} className="flex justify-between">
-                                                            <span className="font-semibold text-gray-500">{subKey}:</span>
-                                                            <span className="text-gray-700">{item[subKey]}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        // Sinon, affiche la valeur directement
-                                        <span className="text-gray-800">{value}</span>
-                                    )}
-                                </div>
-                            );
-                        })}
-
-
-                        {!isAdmin && !hasAlreadyLiked && <Button label="Liker" onClick={() => handleLike(project.id)} />}
-                        {isAdmin && <Button label="Modifier" onClick={() => handleUpdate(project)} />}
-                        {isAdmin && project.publishing_status !== "caché" && <Button label="Cacher" onClick={() => handlePublishingStatus(project.id, "caché")} />}
-                        {isAdmin && project.publishing_status !== "publié" && <Button label="Publier" onClick={() => handlePublishingStatus(project.id, "publié")} />}
-                    </div>
+                    const hasAlreadyLiked = project?.likes?.includes(userId);
+                    const published = project.publishing_status !== "caché";
+                    return (
+                        <ProjectCard
+                            key={index}
+                            project={project}
+                            onClick={() => {
+                                setProject(project)
+                                setIsOpen(true)
+                            }}
+                            onLike={() => handleLike(project.id)}
+                            onPublish={() => handlePublishingStatus(project.id, published ? "caché" : "publié")}
+                            onComment={handleComment}
+                            hasAlreadyLiked={hasAlreadyLiked}
+                            published={published}
+                            categories={categories}
+                            technologies={technologies}
+                            students={students}
+                        />
+                    );
                 })}
             </div>
         </div>

@@ -5,9 +5,7 @@ import { getJson } from "./fetch.services"
 export const useGetProjects = () => {
     const { setGlobalLoading } = useGlobal()
     const [projects, setProjects] = useState([])
-    console.log({ projects });
-
-
+    
     const getProjects = () => {
         setGlobalLoading(true)
         getJson('project')

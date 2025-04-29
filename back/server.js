@@ -71,12 +71,20 @@ app.get('/project', async (req, res) => {
                     retrieveLinkedDetails('Commentaires', project.comments),
                 ]);
 
+                const commentUserIds = commentsDetails.flatMap(comment => comment.user);
+                const commentUserDetails = await retrieveLinkedDetails('Users', commentUserIds);
+
+                const enrichedCommentsDetails = commentsDetails.map(comment => ({
+                    ...comment,
+                    userDetails: commentUserDetails.find(user => user.id === comment.user[0])
+                }));
+
                 return {
                     ...project,
                     studentDetails,
                     categoryDetails,
                     technologyDetails,
-                    commentsDetails,
+                    commentsDetails: enrichedCommentsDetails,
                 };
             })
         );
@@ -137,7 +145,6 @@ app.put('/project', async (req, res) => {
             name,
             user: toArray(student),
             category: toArray(category),
-            publishing_status: "caché",
             description,
             project_link,
             technologies: toArray(technologies),
@@ -157,25 +164,40 @@ app.put('/project', async (req, res) => {
 
 app.put('/project/like', async (req, res) => {
     try {
-        const { id, user } = req.body
+        const { id, user } = req.body;
+
         if (!id) {
-            throw new Error('Un ID est obligatoire pour liker')
+            throw new Error('Un ID est obligatoire pour liker');
         }
+
         const records = await retrieve('Projets', { filterByFormula: `RECORD_ID()='${id.trim()}'` });
         if (records.length === 0) {
             throw new Error(`Le projet avec l'ID ${id.trim()} n'existe pas`);
         }
 
-        await checkIdsExistence('Users', user)
-        const oldProject = records[0]
+        await checkIdsExistence('Users', user);
+        const oldProject = records[0];
+        const likes = toArray(oldProject.likes);
 
-        const data = await update('Projets', [{
-            id,
-            fields: {
-                "likes": [...toArray(oldProject.likes), user]
-            }
-        }]);
-        res.send({ data });
+        if (likes.includes(user)) {
+            const updatedLikes = likes.filter(like => like !== user);
+            const data = await update('Projets', [{
+                id,
+                fields: {
+                    "likes": updatedLikes
+                }
+            }]);
+            res.send({ data, message: 'Like retiré' });
+        } else {
+            const data = await update('Projets', [{
+                id,
+                fields: {
+                    "likes": [...likes, user]
+                }
+            }]);
+            res.send({ data, message: 'Like ajouté' });
+        }
+
     } catch (error) {
         console.error('Error liking project:', error);
         res.status(500).send('Internal Server Error');
