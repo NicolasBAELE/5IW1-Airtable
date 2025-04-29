@@ -3,6 +3,7 @@ import Input from "../components/Input"
 import { Button } from "../components/Button"
 import { postJson } from "../services/fetch.services"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 
 export const Register = () => {
     const [email, setEmail] = useState("")
@@ -10,12 +11,13 @@ export const Register = () => {
     const [fisrtName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
     const navigate = useNavigate();
+    const { login } = useAuth()
 
 
     const register = () => {
         const userData = { email, password, first_name: fisrtName, last_name: lastName };
         postJson('user', userData)
-            .then(() => alert('Utilisateur créé'))
+            .then(() => login({ email, password }))
             .catch(err => alert(err))
     }
 

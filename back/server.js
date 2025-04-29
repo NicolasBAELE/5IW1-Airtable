@@ -71,12 +71,20 @@ app.get('/project', async (req, res) => {
                     retrieveLinkedDetails('Commentaires', project.comments),
                 ]);
 
+                const commentUserIds = commentsDetails.flatMap(comment => comment.user);
+                const commentUserDetails = await retrieveLinkedDetails('Users', commentUserIds);
+
+                const enrichedCommentsDetails = commentsDetails.map(comment => ({
+                    ...comment,
+                    userDetails: commentUserDetails.find(user => user.id === comment.user[0])
+                }));
+
                 return {
                     ...project,
                     studentDetails,
                     categoryDetails,
                     technologyDetails,
-                    commentsDetails,
+                    commentsDetails: enrichedCommentsDetails,
                 };
             })
         );
@@ -137,7 +145,6 @@ app.put('/project', async (req, res) => {
             name,
             user: toArray(student),
             category: toArray(category),
-            publishing_status: "caché",
             description,
             project_link,
             technologies: toArray(technologies),

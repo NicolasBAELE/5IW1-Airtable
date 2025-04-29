@@ -2,11 +2,9 @@ import { useState } from "react";
 import { Button } from "../components/Button";
 import ProjectModal from "../components/ProjectModal";
 import { useGetProjects } from "../services/useGetProjects";
-import { putJson } from "../services/fetch.services";
+import { postJson, putJson } from "../services/fetch.services";
 import { useAuth } from "../contexts/AuthContext";
 import ProjectCard from "../components/ProjectCard";
-import { useGetComments } from "../services/useGetComments";
-import Modal from "../components/Modal";
 import { useGetCategories } from "../services/useGetCategories";
 import { useGetTechnologies } from "../services/useGetTechnologies";
 import { useGetStudents } from "../services/useGetStudents";
@@ -49,6 +47,14 @@ export const Projects = () => {
         }
     };
 
+    const handleComment = (id, comment) => {
+        postJson('comment', {
+            comment,
+            project: id,
+            user: userId
+        }).finally(() => getProjects())
+    }
+
     const handleClose = () => {
         setIsOpen(false);
         setProject(null);
@@ -89,6 +95,7 @@ export const Projects = () => {
                             }}
                             onLike={() => handleLike(project.id)}
                             onPublish={() => handlePublishingStatus(project.id, published ? "caché" : "publié")}
+                            onComment={handleComment}
                             hasAlreadyLiked={hasAlreadyLiked}
                             published={published}
                             categories={categories}

@@ -1,22 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./Button";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function ProjectCard({ project, onClick, onLike, onPublish, published, hasAlreadyLiked, categories = [], technologies = [], students = [] }) {
-    const { isAdmin } = useAuth()
-    
-    // Fonctions de mapping
+export default function ProjectCard({ onComment, project, onClick, onLike, onPublish, published, hasAlreadyLiked, categories = [], technologies = [], students = [] }) {
+    const { isAdmin } = useAuth();
+    const [openComment, setOpenComment] = useState(false);
+    const [commentText, setCommentText] = useState("");
+
+    const handleComment = () => {
+        onComment(project.id, commentText);
+        setCommentText("");
+        setOpenComment(false);
+    };
+
     const getCategoryName = (cat) => {
         if (!cat) return 'Non assignée';
         if (typeof cat === 'object' && cat.category_name) return cat.category_name;
         const found = categories.find(c => c.id === cat);
         return found ? found.category_name : cat;
     };
+
     const getTechName = (techId) => {
         const found = technologies.find(t => t.id === techId);
         return found ? found.name : techId;
     };
+
     const getStudentName = (student) => {
         if (!student) return 'Non assigné';
         if (typeof student === 'object' && student.first_name) return `${student.first_name} ${student.last_name}`;
@@ -24,7 +33,6 @@ export default function ProjectCard({ project, onClick, onLike, onPublish, publi
         return found ? `${found.first_name} ${found.last_name}` : student;
     };
 
-    // Récupération des infos supplémentaires
     const imageUrl = project.image && project.image[0] && project.image[0].url;
     const categoryDisplay = project.category
         ? Array.isArray(project.category)
@@ -42,7 +50,6 @@ export default function ProjectCard({ project, onClick, onLike, onPublish, publi
             : getStudentName(project.user)
         : 'Auteur inconnu';
 
-    // Description courte
     const shortDesc = project.description && project.description.length > 90
         ? project.description.slice(0, 90) + "..."
         : project.description;
@@ -54,10 +61,10 @@ export default function ProjectCard({ project, onClick, onLike, onPublish, publi
         >
             {imageUrl && (
                 <div className="relative h-48 w-full overflow-hidden">
-                    <img 
-                        src={imageUrl} 
-                        alt={project.name} 
-                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-110" 
+                    <img
+                        src={imageUrl}
+                        alt={project.name}
+                        className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
                         <h3 className="text-xl font-bold text-white truncate">{project.name}</h3>
@@ -86,8 +93,8 @@ export default function ProjectCard({ project, onClick, onLike, onPublish, publi
                 {techDisplay.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                         {techDisplay.map((tech, idx) => (
-                            <span 
-                                key={idx} 
+                            <span
+                                key={idx}
                                 className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium transition-colors hover:bg-blue-200"
                             >
                                 {tech}
@@ -95,15 +102,41 @@ export default function ProjectCard({ project, onClick, onLike, onPublish, publi
                         ))}
                     </div>
                 )}
+                {openComment && (
+                    <div className="mt-4">
+                        <textarea
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            placeholder="Ajouter un commentaire..."
+                        />
+                        <Button
+                            label="Envoyer"
+                            onClick={(e) => {
+                                handleComment()
+                                e.stopPropagation()
+                            }}
+                            className="mt-2 bg-blue-500 text-white hover:opacity-90 transition-opacity"
+                        />
+                    </div>
+                )}
             </CardContent>
             <CardFooter className="border-t bg-gray-50/50">
                 <div className="flex items-center justify-between w-full py-2">
                     {isAdmin ? (
-                        <Button
-                            label={published ? "Cacher" : "Publier"}
-                            onClick={e => { e.stopPropagation(); onPublish(project.id); }}
-                            className={`${published ? "bg-pink-500" : "bg-gray-500"} text-white hover:opacity-90 transition-opacity`}
-                        />
+                        <>
+                            <Button
+                                label={published ? "Cacher" : "Publier"}
+                                onClick={e => { e.stopPropagation(); onPublish(project.id); }}
+                                className={`${published ? "bg-pink-500" : "bg-gray-500"} text-white hover:opacity-90 transition-opacity`}
+                            />
+                            <Button
+                                label={"Commenter"}
+                                onClick={e => { e.stopPropagation(); setOpenComment(true); }}
+                                className={`${published ? "bg-pink-500" : "bg-gray-500"} text-white hover:opacity-90 transition-opacity`}
+                            />
+                        </>
                     ) : (
                         <Button
                             label={hasAlreadyLiked ? "Je n'aime plus" : "J'aime"}
@@ -119,4 +152,4 @@ export default function ProjectCard({ project, onClick, onLike, onPublish, publi
             </CardFooter>
         </Card>
     );
-} 
+}

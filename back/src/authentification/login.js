@@ -16,9 +16,6 @@ async function login(email, password) {
             throw new Error('Mot de passe incorrect');
         }
 
-        console.log(user);
-        console.log({ userId: user.id, isAdmin: !!user.is_admin });
-
         const token = jwt.sign({ userId: user.id, isAdmin: !!user.is_admin }, process.env.JWT_SECRET, { expiresIn: '1h' });
         return { token };
     } catch (error) {

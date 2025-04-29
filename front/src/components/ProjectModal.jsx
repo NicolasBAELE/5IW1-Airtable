@@ -48,9 +48,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
             if (file) {
                 payload.image_url = await handleUpload();
             } else if (project?.image) {
-                console.log(project.image[0].url);
-
-                payload.image_url = project.image[0].url
+                payload.image_url = project.image[0].url;
             }
             method('project', payload).finally(onSuccess);
             setProjectName('');
@@ -168,7 +166,7 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                         <p>{description}</p>
                     )}
                 </div>
-                <div className="mb-4">
+                {isAdmin && <div className="mb-4">
                     <h3 className="font-bold text-lg mb-1">Image du projet</h3>
                     {isAdmin ? (
                         <>
@@ -182,13 +180,13 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                     ) : (
                         project?.image && (
                             <div>
-                                <img src={project.image} alt="Project" className="max-h-56" />
+                                <img src={project.image[0].url} alt="Project" className="max-h-56" />
                             </div>
                         )
                     )}
-                </div>
+                </div>}
                 <div className="mb-4">
-                    <h3 className="font-bold text-lg mb-1">Sélectionner un Étudiant</h3>
+                    <h3 className="font-bold text-lg mb-1">Étudiant</h3>
                     {isAdmin ? (
                         <select
                             value={selectedStudent}
@@ -204,17 +202,12 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                         </select>
                     ) : (
                         <div className="mt-1 p-2 w-full border rounded-md bg-gray-50">
-                            {
-                                typeof project?.user === 'object' && project?.user?.first_name
-                                    ? `${project.user.first_name} ${project.user.last_name}`
-                                    : (students.find(s => s.id === project?.user)?.first_name + ' ' + students.find(s => s.id === project?.user)?.last_name)
-                                    || 'Non assigné'
-                            }
+                            {project?.studentDetails?.[0]?.first_name} {project?.studentDetails?.[0]?.last_name}
                         </div>
                     )}
                 </div>
                 <div className="mb-4">
-                    <h3 className="font-bold text-lg mb-1">Sélectionner une Catégorie</h3>
+                    <h3 className="font-bold text-lg mb-1">Catégorie</h3>
                     {isAdmin ? (
                         <select
                             value={selectedCategory}
@@ -230,17 +223,12 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                         </select>
                     ) : (
                         <div className="mt-1 p-2 w-full border rounded-md bg-gray-50">
-                            {
-                                typeof project?.category === 'object' && project?.category?.category_name
-                                    ? project.category.category_name
-                                    : (categories.find(c => c.id === project?.category)?.category_name)
-                                    || 'Non assigné'
-                            }
+                            {project?.categoryDetails?.[0]?.category_name}
                         </div>
                     )}
                 </div>
                 <div className="mb-4">
-                    <h3 className="font-bold text-lg mb-1">Sélectionner des Technologies</h3>
+                    <h3 className="font-bold text-lg mb-1">Technologies</h3>
                     {isAdmin ? (
                         <div className="flex flex-wrap gap-2 mb-4">
                             {technologies.map((technology) => (
@@ -275,6 +263,23 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                             );
                         })}
                     </div>
+                </div>
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg mb-1">Commentaires</h3>
+                    {project?.commentsDetails?.length > 0 ? (
+                        <ul className="space-y-2">
+                            {project?.commentsDetails?.slice().sort((a, b) =>
+                                new Date(a.creation_date) - new Date(b.creation_date)
+                            ).map((comment, idx) => (
+                                <li key={idx} className="border-b pb-2">
+                                    <span className="font-medium text-gray-700">{comment.userDetails ? `${comment.userDetails.first_name} ${comment.userDetails.last_name}` : 'Anonyme'} :</span>
+                                    <span className="ml-2">{comment.comment}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>Aucun commentaire pour ce projet.</p>
+                    )}
                 </div>
             </div>
         </Modal>
