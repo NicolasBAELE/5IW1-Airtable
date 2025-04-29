@@ -193,17 +193,24 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                         <select
                             value={selectedStudent}
                             onChange={(e) => setSelectedStudent(e.target.value)}
-                            className="mt-1 p-2 w-full border rounded-md"
+                            className="mt-1 p-2 w-full border rounded-md bg-white shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         >
                             <option value="" disabled>Sélectionner un étudiant</option>
-                            {students.map((student, index) => (
-                                <option key={index} value={student.id}>
+                            {students.map((student) => (
+                                <option key={student.id} value={student.id}>
                                     {student.first_name} {student.last_name}
                                 </option>
                             ))}
                         </select>
                     ) : (
-                        <p>{selectedStudent}</p>
+                        <div className="mt-1 p-2 w-full border rounded-md bg-gray-50">
+                            {
+                                typeof project?.user === 'object' && project?.user?.first_name
+                                    ? `${project.user.first_name} ${project.user.last_name}`
+                                    : (students.find(s => s.id === project?.user)?.first_name + ' ' + students.find(s => s.id === project?.user)?.last_name)
+                                    || 'Non assigné'
+                            }
+                        </div>
                     )}
                 </div>
                 <div className="mb-4">
@@ -212,17 +219,24 @@ const ProjectModal = ({ isOpen, onClose, onSuccess, project = null }) => {
                         <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="mt-1 p-2 w-full border rounded-md"
+                            className="mt-1 p-2 w-full border rounded-md bg-white shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         >
                             <option value="" disabled>Sélectionner une catégorie</option>
-                            {categories.map((categorie, index) => (
-                                <option key={index} value={categorie.id}>
-                                    {categorie.category_name}
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.category_name}
                                 </option>
                             ))}
                         </select>
                     ) : (
-                        <p>{selectedCategory}</p>
+                        <div className="mt-1 p-2 w-full border rounded-md bg-gray-50">
+                            {
+                                typeof project?.category === 'object' && project?.category?.category_name
+                                    ? project.category.category_name
+                                    : (categories.find(c => c.id === project?.category)?.category_name)
+                                    || 'Non assigné'
+                            }
+                        </div>
                     )}
                 </div>
                 <div className="mb-4">
