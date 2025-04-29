@@ -4,7 +4,6 @@ import { Button } from './Button';
 const Modal = ({ isOpen, onClose, title, children, actions, headerImage }) => {
     if (!isOpen) return null;
 
-    // Gestion du clic sur le fond
     const handleOverlayClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();

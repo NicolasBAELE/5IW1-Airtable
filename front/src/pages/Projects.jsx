@@ -8,6 +8,7 @@ import ProjectCard from "../components/ProjectCard";
 import { useGetCategories } from "../services/useGetCategories";
 import { useGetTechnologies } from "../services/useGetTechnologies";
 import { useGetStudents } from "../services/useGetStudents";
+import { motion } from "framer-motion";
 
 export const Projects = () => {
     const { projects, getProjects } = useGetProjects();
@@ -64,14 +65,34 @@ export const Projects = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             <ProjectModal isOpen={isOpen} onClose={handleClose} onSuccess={getProjects} project={project} />
-            <div className="flex justify-between items-center mb-8">
+            {isAdmin && <div className="flex justify-between items-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800">Projets</h2>
                 <Button
                     label="Ajouter un Projet"
                     onClick={() => setIsOpen(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                 />
-            </div>
+            </div>}
+            {!isAdmin &&
+                <div className="w-full max-w-4xl mx-auto px-4 pt-24 pb-12">
+                    <motion.h1
+                        className="text-4xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 via-pink-500 to-purple-500 bg-clip-text text-transparent drop-shadow-lg text-center"
+                        initial={{ opacity: 0, y: -30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        Découvrez les portfolios des élèves
+                    </motion.h1>
+                    <motion.p
+                        className="text-lg text-gray-700 max-w-2xl mx-auto mb-10 text-center"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.6 }}
+                    >
+                        Bienvenue sur la plateforme qui met en avant les projets, compétences et réalisations des étudiants de l'école. Explorez, recherchez et soutenez la créativité de nos talents !
+                    </motion.p>
+                </div>
+            }
             <div className="mb-6">
                 <input
                     type="text"

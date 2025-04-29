@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from './Button';
 import { useAuth } from '../contexts/AuthContext';
 import { Menu, X } from 'lucide-react';
 
@@ -10,10 +9,8 @@ const Navbar = () => {
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // Définir les liens principaux
     const mainLinks = [
-        { label: 'Home', path: '/' },
-        { label: 'Projets', path: '/projects', auth: true },
+        { label: 'Projets', path: '/', auth: true },
     ];
     const adminLinks = [
         { label: 'Commentaires', path: '/comments' },
@@ -25,7 +22,6 @@ const Navbar = () => {
     return (
         <nav className="bg-gradient-to-r from-blue-50 via-pink-100 to-purple-100 shadow-md px-4 py-2 sticky top-0 z-50">
             <div className="container mx-auto flex justify-between items-center">
-                {/* Logo modernisé */}
                 <div
                     className="text-2xl font-extrabold tracking-tight flex items-center gap-2 cursor-pointer select-none"
                     onClick={() => navigate('/')}
@@ -34,14 +30,12 @@ const Navbar = () => {
                     <span className="text-gray-800">Portfolio</span>
                 </div>
 
-                {/* Mobile menu button */}
                 <div className="md:hidden">
                     <button onClick={() => setMenuOpen(!menuOpen)} className="focus:outline-none">
                         {menuOpen ? <X size={28} /> : <Menu size={28} />}
                     </button>
                 </div>
 
-                {/* Desktop menu */}
                 <ul className="hidden md:flex space-x-2 items-center">
                     {mainLinks.map(link => (
                         (!link.auth || isAuthenticated) && (
@@ -98,7 +92,6 @@ const Navbar = () => {
                 </ul>
             </div>
 
-            {/* Mobile menu dropdown */}
             {menuOpen && (
                 <ul className="md:hidden mt-4 space-y-3 bg-white/90 rounded-xl shadow-lg p-4">
                     {mainLinks.map(link => (

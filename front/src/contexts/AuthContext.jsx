@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
         const decoded = jwtDecode(token)
         setIsAuthenticated(true)
         setToken(decoded)
-        navigate('/projects')
+        navigate('/')
       })
       .catch(err => alert(err))
       .finally(() => setGlobalLoading(false))

@@ -310,7 +310,6 @@ app.post('/comment', async (req, res) => {
 });
 
 
-// Démarrer le serveur
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

@@ -28,7 +28,6 @@ export const Categories = () => {
         }
     };
 
-    // Projets filtrés par catégorie sélectionnée
     const filteredProjects = selectedCategory
         ? projects.filter(project =>
             Array.isArray(project.category)

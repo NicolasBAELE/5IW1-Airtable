@@ -12,7 +12,6 @@ import { Register } from "./pages/register";
 import { Students } from "./pages/Students";
 import { Technologies } from "./pages/Technologies";
 import LoadingBar from "./components/LoadingBar";
-import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 
 function App() {
@@ -26,7 +25,7 @@ function App() {
                             <Route path="/">
                                 <Route
                                     index
-                                    element={<Home />}
+                                    element={<ProtectedRoute element={Projects} />}
                                 />
                                 <Route
                                     path="register"
@@ -39,10 +38,6 @@ function App() {
                                 <Route
                                     path="students"
                                     element={<ProtectedRoute element={Students} />}
-                                />
-                                <Route
-                                    path="projects"
-                                    element={<ProtectedRoute element={Projects} />}
                                 />
                                 <Route
                                     path="categories"

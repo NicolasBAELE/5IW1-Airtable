@@ -18,7 +18,6 @@ export const useGetComments = () => {
                                 getJson(`project/${comment.project[0]}`)
                             ]);
 
-                            // Vérifier si les réponses sont des tableaux et contiennent des données
                             const userDetails = Array.isArray(userResponse) && userResponse.length > 0 ? userResponse[0] : null;
                             const projectDetails = Array.isArray(projectResponse) && projectResponse.length > 0 ? projectResponse[0] : null;
 

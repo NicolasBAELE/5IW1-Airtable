@@ -26,7 +26,6 @@ export const Technologies = () => {
         }
     };
 
-    // Projets filtrés par technologie sélectionnée
     const filteredProjects = selectedTech
         ? projects.filter(project =>
             Array.isArray(project.technologies)
